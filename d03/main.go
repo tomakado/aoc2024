@@ -12,8 +12,8 @@ import (
 var input []byte
 
 var (
-	opPtn     = regexp.MustCompile(`(don't|do|mul\((?P<a>[0-9]{1,3}),(?P<b>[0-9]{1,3})\))`)
-	opArgsPtn = regexp.MustCompile(`(?P<a>[0-9]{1,3}),(?P<b>[0-9]{1,3})`)
+	opPtn     = regexp.MustCompile(`(don't|do|mul\([0-9]{1,3},[0-9]{1,3}\))`)
+	opArgsPtn = regexp.MustCompile(`[0-9]{1,3},[0-9]{1,3}`)
 )
 
 func main() {
