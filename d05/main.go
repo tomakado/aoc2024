@@ -71,16 +71,13 @@ func sortUpdate(update []int) []int {
 	copy(sorted, update)
 
 	sort.SliceStable(sorted, func(i, j int) bool {
-		ruleJ, ok := rules[sorted[j]]
-		if !ok {
+		ruleJ, ruleJExists := rules[sorted[j]]
+		if !ruleJExists {
 			return true
 		}
 
-		if _, ok := ruleJ[sorted[i]]; ok {
-			return false
-		}
-
-		return true
+		_, contains := ruleJ[sorted[i]]
+		return contains
 	})
 
 	return sorted
