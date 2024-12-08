@@ -15,13 +15,6 @@ type equation struct {
 	right []int
 }
 
-type op uint8
-
-const (
-	opAdd op = iota
-	opMul
-)
-
 func main() {
 	eqs := readInput()
 	fmt.Println(sumLeftPossiblyTrue(eqs))
