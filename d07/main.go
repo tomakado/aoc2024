@@ -3,6 +3,7 @@ package main
 import (
 	_ "embed"
 	"fmt"
+	"math"
 	"strconv"
 	"strings"
 )
@@ -43,8 +44,13 @@ func isPossiblyTrue(left int, right []int, acc int) bool {
 }
 
 func concat(a, b int) int {
-	res, _ := strconv.Atoi(fmt.Sprintf("%d%d", a, b))
-	return res
+	digits := 1
+
+	for temp := b; temp >= 10; temp /= 10 {
+		digits++
+	}
+
+	return a*int(math.Pow10(digits)) + b
 }
 
 func readInput() []equation {
