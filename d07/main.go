@@ -44,13 +44,9 @@ func isPossiblyTrue(left int, right []int, acc int) bool {
 		return acc+right[0] == left || acc*right[0] == left || concat(acc, right[0]) == left
 	}
 
-	if isPossiblyTrue(left, right[1:], acc+right[0]) ||
+	return isPossiblyTrue(left, right[1:], acc+right[0]) ||
 		isPossiblyTrue(left, right[1:], acc*right[0]) ||
-		isPossiblyTrue(left, right[1:], concat(acc, right[0])) {
-		return true
-	}
-
-	return false
+		isPossiblyTrue(left, right[1:], concat(acc, right[0]))
 }
 
 func concat(a, b int) int {
