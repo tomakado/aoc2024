@@ -4,50 +4,63 @@ import (
 	"fmt"
 	"strconv"
 	"strings"
-
-	"go.tomakado.io/containers/list"
 )
 
 const input = "70949 6183 4 3825336 613971 0 15 182"
 
 func main() {
-	l := deserialize(input)
-
-	for i := 0; i < 25; i++ {
-		blink(l)
-	}
-
-	fmt.Println(l.Len())
+	nums := readInput(input)
+	fmt.Println(s(nums, 25))
+	fmt.Println(s(nums, 75))
 }
 
-func blink(l *list.List[int]) {
-	for e := l.Front(); e != nil; e = e.Next() {
-		switch {
-		case e.Value == 0:
-			e.Value = 1
-		case numDigits(e.Value)%2 == 0:
-			left, right := splitNum(e.Value)
-			e.Value = left
-			l.InsertAfter(right, e)
-			e = e.Next()
-		default:
-			e.Value *= 2024
+type memoTuple struct{ num, acc int }
+
+var sMemo = map[memoTuple]int{}
+
+func s(nums []int, acc int) int {
+	if acc == 0 {
+		return len(nums)
+	}
+
+	if len(nums) == 1 {
+		num := nums[0]
+		if val, ok := sMemo[memoTuple{num, acc}]; ok {
+			return val
 		}
+
+		var toMemoize int
+
+		switch {
+		case num == 0:
+			toMemoize = s([]int{1}, acc-1)
+		case numDigits(num)%2 == 0:
+			left, right := splitNum(num)
+			toMemoize = s([]int{left, right}, acc-1)
+		default:
+			toMemoize = s([]int{num * 2024}, acc-1)
+		}
+
+		sMemo[memoTuple{num, acc}] = toMemoize
+		return toMemoize
 	}
+
+	var sum int
+
+	for _, n := range nums {
+		sum += s([]int{n}, acc)
+	}
+
+	return sum
 }
 
-func serialize(l *list.List[int]) string {
-	var out strings.Builder
-
-	for e := l.Front(); e != nil; e = e.Next() {
-		out.WriteString(strconv.Itoa(e.Value))
-		out.WriteString(" ")
-	}
-
-	return out.String()
-}
+var numDigitsMemo = map[int]int{}
 
 func numDigits(num int) int {
+	if val, ok := numDigitsMemo[num]; ok {
+		return val
+	}
+
 	var numDigits int
 
 	x := num
@@ -55,6 +68,8 @@ func numDigits(num int) int {
 		numDigits++
 		x /= 10
 	}
+
+	numDigitsMemo[num] = numDigits
 
 	return numDigits
 }
@@ -67,8 +82,8 @@ func splitNum(num int) (int, int) {
 	return num / p, num % p
 }
 
-func deserialize(input string) *list.List[int] {
-	l := list.New[int]().Init()
+func readInput(input string) []int {
+	var nums []int
 
 	for _, e := range strings.Split(input, " ") {
 		if e == "" {
@@ -76,10 +91,10 @@ func deserialize(input string) *list.List[int] {
 		}
 
 		num, _ := strconv.Atoi(e)
-		l.PushBack(num)
+		nums = append(nums, num)
 	}
 
-	return l
+	return nums
 }
 
 func intPow(n, m int) int {
