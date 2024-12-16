@@ -36,12 +36,10 @@ func (r region) fencingPrice2() int {
 }
 
 func (r region) perimeter() int {
-	var perimeter int
-
-	pointsMap := make(map[utils.Vec2]struct{}, len(r.plots))
-	for _, p := range r.plots {
-		pointsMap[p] = struct{}{}
-	}
+	var (
+		perimeter int
+		pointsMap = r.pointsMap()
+	)
 
 	for _, p := range r.plots {
 		for _, dir := range utils.Directions {
@@ -57,9 +55,43 @@ func (r region) perimeter() int {
 }
 
 func (r region) numOfSides() int {
-	var numOfSides int
+	var (
+		pointsMap = r.pointsMap()
+		checks    = [][]utils.Vec2{
+			{utils.Left, utils.Up},
+			{utils.Down, utils.Left},
+			{utils.Right, utils.Down},
+			{utils.Up, utils.Right},
+		}
+		numSides int
+	)
 
-	return numOfSides
+	for _, p := range r.plots {
+		for _, check := range checks {
+			dirA, dirB := check[0], check[1]
+			pointA := p.Add(dirA)
+			pointB := p.Add(dirB)
+			pointAB := p.Add(dirA).Add(dirB)
+			_, aOk := pointsMap[pointA]
+			_, bOk := pointsMap[pointB]
+			_, abOk := pointsMap[pointAB]
+
+			if (!aOk && !bOk) || (aOk && bOk && !abOk) {
+				numSides++
+			}
+		}
+	}
+
+	return numSides
+}
+
+func (r region) pointsMap() map[utils.Vec2]struct{} {
+	pointsMap := make(map[utils.Vec2]struct{}, len(r.plots))
+	for _, p := range r.plots {
+		pointsMap[p] = struct{}{}
+	}
+
+	return pointsMap
 }
 
 func (r region) String() string {
